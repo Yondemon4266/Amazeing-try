@@ -44,7 +44,7 @@ class MazeConfigParser:
     def read_parse_maze_config(self, filename: str) -> None:
 
         config: dict[str, str] = self.read_config_file(filename)
-        print(config)
+        print("RAW DICTIONNARY CONFIG:", config)
         self.required_keys_ok(config)
         int_keys = ["WIDTH", "HEIGHT"]
         coord_keys = ["ENTRY", "EXIT"]
@@ -67,6 +67,10 @@ class MazeConfigParser:
         self.check_out_of_limit(
             self.exit[0], self.exit[1], self.width, self.height
         )
+        if self.entry == self.exit:
+            raise MazeConfigValueError(
+                "ENTRY and EXIT positions must be different."
+            )
 
     @staticmethod
     def read_config_file(filename: str) -> dict[str, str]:
@@ -149,20 +153,20 @@ class MazeConfigParser:
     def check_out_of_limit(x: int, y: int, x_max: int, y_max: int) -> None:
         if x < 0 or y < 0:
             raise MazeConfigError(
-                f"Coordinates x:{x} y:{y} must be in the bounds of "
-                f"the maze ({x_max},{y_max})"
+                f"Coordinates x:{x} y:{y} are out of bounds of the maze."
+                f"they must be between (0,0) and ({x_max-1},{y_max-1})"
             )
-        if x > x_max or y > y_max:
+        if x >= x_max or y >= y_max:
             raise MazeConfigError(
-                f"Coordinates x:{x} y:{y} must be in the bounds of"
-                f"the maze ({x_max},{y_max})"
+                f"Coordinates x:{x} y:{y} are out of bounds of the maze."
+                f"they must be between (0,0) and ({x_max-1},{y_max-1})"
             )
 
 
 def parser():
     try:
         maze_config = MazeConfigParser("config.txt")
-        print(maze_config.__dict__)
+        print("CONFIG PARSED: ", maze_config.__dict__)
 
     except MazeConfigError as err:
         print(err.__class__.__name__, err)
