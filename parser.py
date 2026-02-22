@@ -35,9 +35,9 @@ class MazeConfigParser:
         self.exit: tuple[int, int]
         self.perfect: bool
         self.output_file: str
-        self.seed: Optional[str]
-        self.algorithm: Optional[str]
-        self.display_mode: Optional[str]
+        self.seed: Optional[str] = None
+        self.algorithm: Optional[str] = None
+        self.display_mode: Optional[str] = None
         self.option_added: bool = False
         self.read_parse_maze_config(filename)
 
