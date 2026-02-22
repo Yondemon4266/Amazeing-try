@@ -1,4 +1,4 @@
-from typing import Optional
+from MazeConfig import MazeConfig
 
 
 class MazeConfigError(Exception):
@@ -28,49 +28,38 @@ class MazeConfigParser:
     ]
     optional_keys: list[str] = ["SEED", "ALGORITHM", "DISPLAY_MODE"]
 
-    def __init__(self, filename: str) -> None:
-        self.width: int
-        self.height: int
-        self.entry: tuple[int, int]
-        self.exit: tuple[int, int]
-        self.perfect: bool
-        self.output_file: str
-        self.seed: Optional[str] = None
-        self.algorithm: Optional[str] = None
-        self.display_mode: Optional[str] = None
-        self.option_added: bool = False
-        self.read_parse_maze_config(filename)
+    @classmethod
+    def load(cls, filename: str) -> MazeConfig:
+        raw_data = cls.read_config_file(filename)
 
-    def read_parse_maze_config(self, filename: str) -> None:
+        cls.required_keys_ok(raw_data)
 
-        config: dict[str, str] = self.read_config_file(filename)
-        print("RAW DICTIONNARY CONFIG:", config)
-        self.required_keys_ok(config)
-        int_keys = ["WIDTH", "HEIGHT"]
-        coord_keys = ["ENTRY", "EXIT"]
-
-        for key in int_keys:
-            setattr(self, key.lower(), self.get_int_value(key, config[key]))
-
-        for key in coord_keys:
-            setattr(self, key.lower(), self.get_coord_values(key, config[key]))
-
-        self.perfect = self.get_bool_value("PERFECT", config["PERFECT"])
-        self.output_file = self.get_output_filename(
-            "OUTPUT_FILE", config["OUTPUT_FILE"]
+        width = cls.get_int_value("WIDTH", raw_data["WIDTH"])
+        height = cls.get_int_value("HEIGHT", raw_data["HEIGHT"])
+        entry = cls.get_coord_values("ENTRY", raw_data["ENTRY"])
+        exit = cls.get_coord_values("EXIT", raw_data["EXIT"])
+        perfect = cls.get_bool_value("PERFECT", raw_data["PERFECT"])
+        output_file = cls.get_output_filename(
+            "OUTPUT_FILE", raw_data["OUTPUT_FILE"]
         )
 
-        self.check_min_width_height(self.width, self.height)
-        self.check_out_of_limit(
-            self.entry[0], self.entry[1], self.width, self.height
+        cls.check_min_width_height(width, height)
+        cls.check_out_of_limit(entry[0], entry[1], width, height)
+        cls.check_out_of_limit(exit[0], exit[1], width, height)
+
+        if entry == exit:
+            raise MazeConfigValueError("ENTRY and EXIT must be different.")
+
+        return MazeConfig(
+            width=width,
+            height=height,
+            entry=entry,
+            exit=exit,
+            perfect=perfect,
+            output_file=output_file,
+            seed=raw_data.get("SEED"),
+            algorithm=raw_data.get("ALGORITHM"),
         )
-        self.check_out_of_limit(
-            self.exit[0], self.exit[1], self.width, self.height
-        )
-        if self.entry == self.exit:
-            raise MazeConfigValueError(
-                "ENTRY and EXIT positions must be different."
-            )
 
     @staticmethod
     def read_config_file(filename: str) -> dict[str, str]:
@@ -165,7 +154,7 @@ class MazeConfigParser:
 
 def parser():
     try:
-        maze_config = MazeConfigParser("config.txt")
+        maze_config = MazeConfigParser.load("config.txt")
         print("CONFIG PARSED: ", maze_config.__dict__)
 
     except MazeConfigError as err:
