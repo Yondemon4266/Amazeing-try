@@ -1,6 +1,6 @@
 
 # Maze width (number of cells)
-WIDTH=20
+WIDTH=18
 
  # Maze height
 HEIGHT=14

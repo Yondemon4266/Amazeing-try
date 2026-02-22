@@ -149,11 +149,13 @@ class MazeConfigParser:
     def check_out_of_limit(x: int, y: int, x_max: int, y_max: int) -> None:
         if x < 0 or y < 0:
             raise MazeConfigError(
-                f"Coordinates x:{x} y:{y} must be in the bounds of the maze"
+                f"Coordinates x:{x} y:{y} must be in the bounds of "
+                f"the maze ({x_max},{y_max})"
             )
         if x > x_max or y > y_max:
             raise MazeConfigError(
-                f"Coordinates x:{x} y:{y} must be in the bounds of the maze"
+                f"Coordinates x:{x} y:{y} must be in the bounds of"
+                f"the maze ({x_max},{y_max})"
             )
 
 
