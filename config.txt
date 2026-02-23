@@ -3,7 +3,7 @@
 WIDTH=20
 
  # Maze height (number of lines)
-HEIGHT=
+HEIGHT=20
 
 # Entry coordinates (x,y)
 ENTRY=0,9
