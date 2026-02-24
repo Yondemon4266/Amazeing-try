@@ -10,7 +10,7 @@ class MazeRenderer:
     def display_terminal(cls, maze: Maze, show_path: bool = False) -> None:
         # Couleurs basées sur votre dictionnaire config1
         WALL = "\033[47m  \033[0m"  # Fond Blanc (2 espaces)
-        PATH = "\033[44m  \033[0m"  # Fond Bleu pour le chemin
+        # PATH = "\033[44m  \033[0m"  # Fond Bleu pour le chemin
         EMPTY = "\033[40m  \033[0m"  # Fond Noir
         ENTRY = "\033[45m  \033[0m"  # Fond Violet
         EXIT = "\033[41m  \033[0m"  # Fond Rouge
