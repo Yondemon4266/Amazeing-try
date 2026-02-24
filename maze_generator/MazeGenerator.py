@@ -8,7 +8,7 @@ import random
 class MazeGenerator:
     def __init__(self, config: MazeConfig):
         self.config = config
-        self.maze = Maze(config.width, config.height)
+        self.maze = Maze(config)
         self._rng = random.Random(self.config.seed)
 
     def generate(self) -> Maze:
