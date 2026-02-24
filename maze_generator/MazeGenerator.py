@@ -44,7 +44,11 @@ class MazeGenerator:
             within_bounds: bool = (
                 0 <= nx < self.maze.width and 0 <= ny < self.maze.height
             )
-            if within_bounds and (nx, ny) not in visited_cells:
+            if (
+                within_bounds
+                and (nx, ny) not in visited_cells
+                and not self.maze.is_cell_in_42(nx, ny)
+            ):
                 valid_walls.append((x, y, nx, ny, direction_bit))
 
         return valid_walls
@@ -53,8 +57,6 @@ class MazeGenerator:
 if __name__ == "__main__":
     try:
         maze_config = MazeConfigParser.load("config.txt")
-        print("CONFIG PARSED: ", maze_config.__dict__)
-
         maze_generator = MazeGenerator(maze_config)
         maze_generator.generate()
     except OSError as err:

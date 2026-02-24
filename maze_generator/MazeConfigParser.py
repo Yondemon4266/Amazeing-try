@@ -29,7 +29,6 @@ class MazeConfigParser:
     @classmethod
     def load(cls, filename: str) -> MazeConfig:
         raw_data = cls.read_config_file(filename)
-        print(raw_data)
         return MazeConfig.model_validate(raw_data)
 
 

@@ -5,55 +5,48 @@ from MazeGenerator import MazeGenerator
 
 
 class MazeRenderer:
-    # On utilise le fond (Background) pour un rendu massif
-    C_PATH = "\033[40m"  # Fond Noir
-    C_WALL = "\033[47m"  # Fond Blanc
-    C_ENTRY = "\033[45m"  # Fond Violet
-    C_EXIT = "\033[41m"  # Fond Rouge
-    RESET = "\033[0m"
-
-    # Deux espaces créent un carré parfait dans la plupart des terminaux
-    BLOCK = "  "
 
     @classmethod
-    def display_terminal(cls, maze: Maze) -> None:
-        # 1. Bordure supérieure complète
-        print(f"{cls.C_WALL}{cls.BLOCK * (maze.width * 2 + 1)}{cls.RESET}")
+    def display_terminal(cls, maze: Maze, show_path: bool = False) -> None:
+        # Couleurs basées sur votre dictionnaire config1
+        WALL = "\033[47m  \033[0m"  # Fond Blanc (2 espaces)
+        PATH = "\033[44m  \033[0m"  # Fond Bleu pour le chemin
+        EMPTY = "\033[40m  \033[0m"  # Fond Noir
+        ENTRY = "\033[45m  \033[0m"  # Fond Violet
+        EXIT = "\033[41m  \033[0m"  # Fond Rouge
+
+        # 1. On dessine d'abord le mur supérieur (North)
+        print(WALL * (maze.width * 2 + 1))
 
         for y in range(maze.height):
-            # ligne_cellules : contient [Mur Ouest][Cellule][Mur Est]...
-            # ligne_murs : contient [Coin][Mur Sud][Coin]...
-            line = f"{cls.C_WALL}{cls.BLOCK}"
-            bottom_line = f"{cls.C_WALL}{cls.BLOCK}"
-
+            # Ligne de contenu de la cellule
+            line = WALL  # Mur Ouest de la bordure
             for x in range(maze.width):
-                # --- LA CELLULE ---
-                # (Ici tu peux ajouter une logique pour l'entrée/sortie)
-                cell_color = cls.C_PATH
+                # Déterminer la couleur du centre de la cellule
                 if (x, y) == maze.config.entry:
-                    cell_color = cls.C_ENTRY
+                    line += ENTRY
                 elif (x, y) == maze.config.exit:
-                    cell_color = cls.C_EXIT
+                    line += EXIT
+                elif maze.is_cell_in_42(x, y):
+                    line += "\033[43m42\033[0m"
+                else:
+                    line += EMPTY
 
-                line += f"{cell_color}{cls.BLOCK}"
-
-                # --- MUR EST ---
+                # Mur Est de la cellule
                 if maze.has_wall(x, y, Maze.EAST):
-                    line += f"{cls.C_WALL}{cls.BLOCK}"
+                    line += WALL
                 else:
-                    line += f"{cls.C_PATH}{cls.BLOCK}"
+                    line += EMPTY
+            print(line)
 
-                # --- MUR SUD ---
+            # Ligne des murs Sud
+            south_line = WALL
+            for x in range(maze.width):
                 if maze.has_wall(x, y, Maze.SOUTH):
-                    bottom_line += f"{cls.C_WALL}{cls.BLOCK}"
+                    south_line += WALL + WALL  # Le mur et le coin
                 else:
-                    bottom_line += f"{cls.C_PATH}{cls.BLOCK}"
-
-                # --- LE COIN (toujours un mur sur cette image) ---
-                bottom_line += f"{cls.C_WALL}{cls.BLOCK}"
-
-            print(f"{line}{cls.RESET}")
-            print(f"{bottom_line}{cls.RESET}")
+                    south_line += EMPTY + WALL  # Vide et le coin
+            print(south_line)
 
 
 def display_maze_debug(maze: Maze) -> None:
@@ -70,10 +63,8 @@ def display_maze_debug(maze: Maze) -> None:
 if __name__ == "__main__":
     try:
         maze_config = MazeConfigParser.load("config.txt")
-        print("CONFIG PARSED: ", maze_config.__dict__)
         maze_generator = MazeGenerator(maze_config)
         maze = maze_generator.generate()
-        display_maze_debug(maze)
         MazeRenderer.display_terminal(maze)
     except OSError as err:
         print(err)

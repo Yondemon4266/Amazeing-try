@@ -14,6 +14,10 @@ class Maze:
         self.width: int = config.width
         self.height: int = config.height
         self.grid: list[int] = [15 for _ in range(self.width * self.height)]
+        self.pattern_42_coords: set[tuple[int, int]] = (
+            self.config.get_absolute_42_coords()
+        )
+
     def get_index(self, x: int, y: int) -> int:
         """Converts coordinates to 1D index"""
         return x + (y * self.width)
@@ -31,8 +35,6 @@ class Maze:
             return True
         cell_value: int = self.grid[self.get_index(x, y)]
         return bool(cell_value & direction)
-    
-    # def is_part_of_pattern(x, y):
 
-    # def is_cell_in_42(self, x: int, y: int) -> bool:
-    #     return (x, y) in self.pattern_42_coords
+    def is_cell_in_42(self, x: int, y: int) -> bool:
+        return (x, y) in self.pattern_42_coords
