@@ -1,15 +1,29 @@
-name: Python Quality Check
+name: Python Quality and Workflow Check
 
 on:
   push:
     branches: [ main, dev ]
   pull_request:
+    types: [opened, reopened, synchronize]
     branches: [ main, dev ]
+  workflow_dispatch: # Permet le lancement manuel pour le test
 
 jobs:
+  # JOB 1 : Vérification de la source (Git Flow)
+  check-branches:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check branches
+        run: |
+          # On ne bloque que si la cible est 'main' et la source n'est pas 'dev'
+          if [ "${{ github.base_ref }}" == "main" ] && [ "${{ github.head_ref }}" != "dev" ]; then
+            echo "ERREUR : Les PR vers 'main' doivent obligatoirement venir de 'dev'."
+            exit 1
+          fi
+
+  # JOB 2 : Qualité du code (Tests, Linting, Types)
   lint-and-test:
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -17,7 +31,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.10' # Ou ta version cible
+        python-version: '3.10'
 
     - name: Install dependencies
       run: |
@@ -25,17 +39,15 @@ jobs:
         pip install flake8 mypy pytest
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-    - name: Run Flake8 (Linting)
+    - name: Run Flake8
       run: |
-        # Arrête le build s'il y a des erreurs de syntaxe Python ou des symboles indéfinis
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # Sortie en douceur pour le reste (avertissements)
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
-    - name: Run Mypy (Type Checking)
+    - name: Run Mypy
       run: |
         mypy . --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
 
-    - name: Run Pytest (Unit Tests)
+    - name: Run Pytest
       run: |
         pytest
