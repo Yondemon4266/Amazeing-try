@@ -1,0 +1,41 @@
+name: Python Quality Check
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10' # Ou ta version cible
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 mypy pytest
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+    - name: Run Flake8 (Linting)
+      run: |
+        # Arrête le build s'il y a des erreurs de syntaxe Python ou des symboles indéfinis
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # Sortie en douceur pour le reste (avertissements)
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+    - name: Run Mypy (Type Checking)
+      run: |
+        mypy . --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
+
+    - name: Run Pytest (Unit Tests)
+      run: |
+        pytest
