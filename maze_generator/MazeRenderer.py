@@ -66,6 +66,7 @@ if __name__ == "__main__":
         maze_generator = MazeGenerator(maze_config)
         maze = maze_generator.generate()
         MazeRenderer.display_terminal(maze)
+        print(display_maze_debug(maze))
     except OSError as err:
         print(err)
     except ValidationError as err:

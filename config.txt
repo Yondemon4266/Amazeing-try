@@ -1,11 +1,11 @@
 
 # Maze width (number of columns)
-WIDTH=9
+WIDTH=40
  # Maze height (number of lines)
-HEIGHT=8
+HEIGHT=40
 
 # Entry coordinates (x,y)
-ENTRY=1,1
+ENTRY=1,5
 
 # Exit coordinates (x,y) 
 EXIT=1,0
