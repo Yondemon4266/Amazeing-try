@@ -1,6 +1,6 @@
-from MazeConfig import MazeConfig
-from Maze import Maze
-from MazeConfigParser import MazeConfigParser
+from maze_generator.MazeConfig import MazeConfig
+from maze_generator.Maze import Maze
+from maze_generator.MazeConfigParser import MazeConfigParser
 from pydantic import ValidationError
 import random
 

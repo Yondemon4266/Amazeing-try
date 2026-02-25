@@ -1,5 +1,5 @@
-from Maze import Maze
-from MazeConfigParser import MazeConfigParser
+from maze_generator.Maze import Maze
+from maze_generator.MazeConfigParser import MazeConfigParser
 from pydantic import ValidationError
 from MazeGenerator import MazeGenerator
 
@@ -49,15 +49,15 @@ class MazeRenderer:
             print(south_line)
 
 
-def display_maze_debug(maze: Maze) -> None:
-    for y in range(maze.height):
-        line: str = ""
-        for x in range(maze.width):
-            index: int = maze.get_index(x, y)
-            val: int = maze.grid[index]
-            # :X converts in hexa CAPS
-            line += f"{val:X}"
-        print(line)
+# def display_maze_debug(maze: Maze) -> None:
+#     for y in range(maze.height):
+#         line: str = ""
+#         for x in range(maze.width):
+#             index: int = maze.get_index(x, y)
+#             val: int = maze.grid[index]
+#             # :X converts in hexa CAPS
+#             line += f"{val:X}"
+#         print(line)
 
 
 if __name__ == "__main__":
@@ -66,7 +66,7 @@ if __name__ == "__main__":
         maze_generator = MazeGenerator(maze_config)
         maze = maze_generator.generate()
         MazeRenderer.display_terminal(maze)
-        print(display_maze_debug(maze))
+        # print(display_maze_debug(maze))
     except OSError as err:
         print(err)
     except ValidationError as err:

@@ -1,4 +1,4 @@
-from MazeConfig import MazeConfig
+from maze_generator.MazeConfig import MazeConfig
 from pydantic import ValidationError
 
 
@@ -32,7 +32,7 @@ class MazeConfigParser:
         return MazeConfig.model_validate(raw_data)
 
 
-def parser():
+def parser() -> None:
     try:
         maze_config = MazeConfigParser.load("config.txt")
         print("CONFIG PARSED: ", maze_config.__dict__)
