@@ -51,3 +51,28 @@ jobs:
     - name: Run Pytest
       run: |
         pytest
+
+  # JOB 3 : Création automatique de la PR (uniquement au push sur dev)
+  create-auto-pr:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create Pull Request if none exists
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Vérifier si une PR ouverte existe déjà de dev vers main
+          pr_exists=$(gh pr list --base main --head dev --json number --status open --jq '.[0].number')
+          
+          if [ -z "$pr_exists" ]; then
+            gh pr create \
+              --base main \
+              --head dev \
+              --title "Release: dev to main" \
+              --body "PR générée automatiquement après push sur dev."
+          else
+            echo "Une PR existe déjà (Numéro: $pr_exists). Pas besoin d'en créer une nouvelle."
+          fi
