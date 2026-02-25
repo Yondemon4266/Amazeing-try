@@ -1,7 +1,7 @@
 from maze_generator.Maze import Maze
 from maze_generator.MazeConfigParser import MazeConfigParser
 from pydantic import ValidationError
-from MazeGenerator import MazeGenerator
+from maze_generator.MazeGenerator import MazeGenerator
 
 
 class MazeRenderer:
