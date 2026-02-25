@@ -1,4 +1,4 @@
-from MazeConfig import MazeConfig
+from maze_generator.MazeConfig import MazeConfig
 from pydantic import ValidationError
 
 
