@@ -1,5 +1,6 @@
 from maze_generator.MazeConfig import MazeConfig
 from pydantic import ValidationError
+from typing import cast
 
 
 class MazeConfigFileError(OSError):
@@ -29,7 +30,7 @@ class MazeConfigParser:
     @classmethod
     def load(cls, filename: str) -> MazeConfig:
         raw_data = cls.read_config_file(filename)
-        return MazeConfig.model_validate(raw_data)
+        return cast(MazeConfig, MazeConfig.model_validate(raw_data))
 
 
 def parser() -> None:
