@@ -6,22 +6,22 @@ on:
   pull_request:
     types: [opened, reopened, synchronize]
     branches: [ main, dev ]
-  workflow_dispatch: # Permet le lancement manuel pour le test
+  workflow_dispatch: 
 
 jobs:
-  # JOB 1 : Vérification de la source (Git Flow)
+  # JOB 1 : Vérification de la source (Uniquement pour les PR vers main)
   check-branches:
+    if: github.base_ref == 'main'
     runs-on: ubuntu-latest
     steps:
       - name: Check branches
         run: |
-          # On ne bloque que si la cible est 'main' et la source n'est pas 'dev'
-          if [ "${{ github.base_ref }}" == "main" ] && [ "${{ github.head_ref }}" != "dev" ]; then
+          if [ "${{ github.head_ref }}" != "dev" ]; then
             echo "ERREUR : Les PR vers 'main' doivent obligatoirement venir de 'dev'."
             exit 1
           fi
 
-  # JOB 2 : Qualité du code (Tests, Linting, Types)
+  # JOB 2 : Qualité du code
   lint-and-test:
     runs-on: ubuntu-latest
     steps:
@@ -41,8 +41,7 @@ jobs:
 
     - name: Run Flake8
       run: |
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+        flake8 .
 
     - name: Run Mypy
       run: |
@@ -52,8 +51,9 @@ jobs:
       run: |
         pytest
 
-  # JOB 3 : Création automatique de la PR (uniquement au push sur dev)
+  # JOB 3 : Création automatique de la PR (Uniquement au push sur dev)
   create-auto-pr:
+    needs: lint-and-test
     if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
     runs-on: ubuntu-latest
     steps:
@@ -64,7 +64,6 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Vérifier si une PR ouverte existe déjà de dev vers main
           pr_exists=$(gh pr list --base main --head dev --json number --status open --jq '.[0].number')
           
           if [ -z "$pr_exists" ]; then
@@ -74,5 +73,5 @@ jobs:
               --title "Release: dev to main" \
               --body "PR générée automatiquement après push sur dev."
           else
-            echo "Une PR existe déjà (Numéro: $pr_exists). Pas besoin d'en créer une nouvelle."
+            echo "Une PR existe déjà (Numéro: $pr_exists)."
           fi
